@@ -28,14 +28,17 @@ print(surgical_data.isnull().sum())
 print(diabetes_data.describe())
 print(surgical_data.describe())
 
-"""
-
 # Visualización de la distribución de clases para el dataset de Diabetes
 sns.countplot(x='Outcome', data=diabetes_data)
 plt.title('Distribución de Clases en el Dataset de Diabetes')
 plt.show()
 
-# Visualización de la distribución de clases para el dataset quirúrgico
-sns.countplot(x='Outcome', data=surgical_data)
-plt.title('Distribución de Clases en el Dataset Quirúrgico')
+# Revisar las columnas del dataset quirúrgico
+print(surgical_data.columns)
+
+"""
+# Visualización de la distribución de la variable de complicaciones
+sns.countplot(x='complication', data=surgical_data)
+plt.title('Distribución de Clases en el Dataset Quirúrgico (Complication)')
 plt.show()
+
