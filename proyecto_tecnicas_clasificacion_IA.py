@@ -80,10 +80,52 @@ X_test_s = scaler.transform(X_test_s)
 logreg_diabetes = LogisticRegression()
 logreg_diabetes.fit(X_train_d, y_train_d)
 
-# Evaluación en el conjunto de validación para Diabetes
-y_pred_val_d = logreg_diabetes.predict(X_val_d)
+# Entrenamiento y evaluación de Regresión Logística y KNN en ambos datasets
+
+# 1. Regresión Logística para Diabetes
+logreg_diabetes = LogisticRegression()
+logreg_diabetes.fit(X_train_d, y_train_d)
+y_pred_val_d_logreg = logreg_diabetes.predict(X_val_d)
+
+# Evaluación de Regresión Logística para Diabetes
 print('Resultados de Regresión Logística para Diabetes:')
-print('Accuracy:', accuracy_score(y_val_d, y_pred_val_d))
-print('Precision:', precision_score(y_val_d, y_pred_val_d))
-print('Recall:', recall_score(y_val_d, y_pred_val_d))
-print('Confusion Matrix:\n', confusion_matrix(y_val_d, y_pred_val_d))
+print('Accuracy:', accuracy_score(y_val_d, y_pred_val_d_logreg))
+print('Precision:', precision_score(y_val_d, y_pred_val_d_logreg))
+print('Recall:', recall_score(y_val_d, y_pred_val_d_logreg))
+print('Confusion Matrix:\n', confusion_matrix(y_val_d, y_pred_val_d_logreg))
+
+# 2. KNN para Diabetes
+knn_diabetes = KNeighborsClassifier(n_neighbors=5)
+knn_diabetes.fit(X_train_d, y_train_d)
+y_pred_val_d_knn = knn_diabetes.predict(X_val_d)
+
+# Evaluación de KNN para Diabetes
+print('Resultados de KNN para Diabetes:')
+print('Accuracy:', accuracy_score(y_val_d, y_pred_val_d_knn))
+print('Precision:', precision_score(y_val_d, y_pred_val_d_knn))
+print('Recall:', recall_score(y_val_d, y_pred_val_d_knn))
+print('Confusion Matrix:\n', confusion_matrix(y_val_d, y_pred_val_d_knn))
+
+# 3. Regresión Logística para el dataset quirúrgico
+logreg_surgical = LogisticRegression()
+logreg_surgical.fit(X_train_s, y_train_s)
+y_pred_val_s_logreg = logreg_surgical.predict(X_val_s)
+
+# Evaluación de Regresión Logística para Quirúrgico
+print('Resultados de Regresión Logística para Quirúrgico:')
+print('Accuracy:', accuracy_score(y_val_s, y_pred_val_s_logreg))
+print('Precision:', precision_score(y_val_s, y_pred_val_s_logreg))
+print('Recall:', recall_score(y_val_s, y_pred_val_s_logreg))
+print('Confusion Matrix:\n', confusion_matrix(y_val_s, y_pred_val_s_logreg))
+
+# 4. KNN para el dataset quirúrgico
+knn_surgical = KNeighborsClassifier(n_neighbors=5)
+knn_surgical.fit(X_train_s, y_train_s)
+y_pred_val_s_knn = knn_surgical.predict(X_val_s)
+
+# Evaluación de KNN para Quirúrgico
+print('Resultados de KNN para Quirúrgico:')
+print('Accuracy:', accuracy_score(y_val_s, y_pred_val_s_knn))
+print('Precision:', precision_score(y_val_s, y_pred_val_s_knn))
+print('Recall:', recall_score(y_val_s, y_pred_val_s_knn))
+print('Confusion Matrix:\n', confusion_matrix(y_val_s, y_pred_val_s_knn))
