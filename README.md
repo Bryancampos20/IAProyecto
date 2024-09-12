@@ -19,7 +19,7 @@ El proyecto implementa los siguientes algoritmos de Machine Learning:
 - Python 3.7+
 - Jupyter Notebook
 
-### Paquetes de Python
+## Paquetes de Python
 
 Para ejecutar este proyecto, es necesario instalar los siguientes paquetes de Python. Puedes encontrarlos en el archivo `requirements.txt`:
 
@@ -32,3 +32,17 @@ Puedes instalar estos paquetes ejecutando:
 
 ```bash
 pip install -r requirements.txt
+```
+
+## Evaluación de los Modelos
+
+Cada modelo será evaluado usando las siguientes métricas:
+
+- `Exactitud (Accuracy)`: Mide el porcentaje de predicciones correctas.
+- `Precisión (Precision)`: Mide cuántos de los ejemplos clasificados como positivos son realmente positivos.
+- `Recall (Sensibilidad)`: Mide cuántos de los ejemplos positivos reales fueron correctamente clasificados.
+- `Matriz de confusión`: Para visualizar el rendimiento del modelo en términos de predicciones correctas e incorrectas.
+
+## Conclusiones
+
+Este proyecto tiene como meta final determinar qué modelos de clasificación son más efectivos para cada uno de los conjuntos de datos y analizar qué características de los datos son más relevantes para hacer predicciones precisas.
