@@ -1,5 +1,5 @@
 import pandas as pd
-
+import itertools
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split
@@ -115,7 +115,7 @@ plt.show()
 
 # Cargar el segundo conjunto de datos modificado
 surgical_data_mod = pd.read_csv('Surgical-deepnet_modificado.csv')
-
+"""
 # Obtener las columnas excepto la columna 'complication'
 features = surgical_data_mod.columns.drop('complication')
 
@@ -147,73 +147,116 @@ sns.pairplot(surgical_data_mod, hue='complication', palette="coolwarm")
 
 # Mostrar el gráfico
 plt.show()
+"""
+# Cargar el dataset quirúrgico modificado
+surgical_data_mod = pd.read_csv('Surgical-deepnet_modificado.csv')
 
-# Separación de los datos y etiquetas para el dataset de Diabetes
+# ---- Para el dataset de Diabetes ----
+# Separar características (X) y variable objetivo (y)
 X_diabetes = diabetes_data.drop('Outcome', axis=1)
 y_diabetes = diabetes_data['Outcome']
 
-# Separación de los datos y etiquetas para el dataset quirúrgico
-X_surgical = surgical_data.drop('complication', axis=1)
-y_surgical = surgical_data['complication']
+# Generar todas las combinaciones posibles de las columnas de X (Diabetes)
+features_diabetes = X_diabetes.columns
+combinations_diabetes = []
+for r in range(1, len(features_diabetes)+1):
+    combinations_diabetes.extend(itertools.combinations(features_diabetes, r))
 
-# División del dataset de Diabetes en entrenamiento, validación y prueba
-X_train_d, X_temp_d, y_train_d, y_temp_d = train_test_split(X_diabetes, y_diabetes, test_size=0.3, random_state=42)
-X_val_d, X_test_d, y_val_d, y_test_d = train_test_split(X_temp_d, y_temp_d, test_size=0.5, random_state=42)
+# Dividir el dataset de Diabetes en entrenamiento y prueba (70% entrenamiento, 30% prueba)
+X_train_d, X_test_d, y_train_d, y_test_d = train_test_split(X_diabetes, y_diabetes, test_size=0.3, random_state=42)
 
-# División del dataset quirúrgico en entrenamiento, validación y prueba
-X_train_s, X_temp_s, y_train_s, y_temp_s = train_test_split(X_surgical, y_surgical, test_size=0.3, random_state=42)
-X_val_s, X_test_s, y_val_s, y_test_s = train_test_split(X_temp_s, y_temp_s, test_size=0.5, random_state=42)
+# Iterar sobre cada combinación de características (Diabetes)
+for combo in combinations_diabetes:
+    print(f"Entrenando modelo con las características: {combo}")
+    
+    # Seleccionar las características correspondientes
+    X_train_combo_d = X_train_d[list(combo)]
+    X_test_combo_d = X_test_d[list(combo)]
+    
+    # Entrenar un modelo de Regresión Logística
+    logreg_diabetes = LogisticRegression(max_iter=10000)
+    logreg_diabetes.fit(X_train_combo_d, y_train_d)
+    
+    # Predecir en el conjunto de prueba
+    y_pred_d = logreg_diabetes.predict(X_test_combo_d)
+    
+    # Calcular y mostrar la precisión
+    accuracy_d = accuracy_score(y_test_d, y_pred_d)
+    print(f"Precisión del modelo de Diabetes con las características {combo}: {accuracy_d}\n")
 
-# Entrenamiento de Regresión Logística para el dataset de Diabetes
-logreg_diabetes = LogisticRegression()
-logreg_diabetes.fit(X_train_d, y_train_d)
 
-# Entrenamiento y evaluación de Regresión Logística y KNN en ambos datasets
+# ---- Para el dataset quirúrgico ----
+# Separar características (X) y variable objetivo (y)
+X_surgical = surgical_data_mod.drop('complication', axis=1)
+y_surgical = surgical_data_mod['complication']
 
-# 1. Regresión Logística para Diabetes
-logreg_diabetes = LogisticRegression()
-logreg_diabetes.fit(X_train_d, y_train_d)
-y_pred_val_d_logreg = logreg_diabetes.predict(X_val_d)
+# Generar todas las combinaciones posibles de las columnas de X (Surgical)
+features_surgical = X_surgical.columns
+combinations_surgical = []
+for r in range(1, len(features_surgical)+1):
+    combinations_surgical.extend(itertools.combinations(features_surgical, r))
 
-# Evaluación de Regresión Logística para Diabetes
-print('Resultados de Regresión Logística para Diabetes:')
-print('Accuracy:', accuracy_score(y_val_d, y_pred_val_d_logreg))
-print('Precision:', precision_score(y_val_d, y_pred_val_d_logreg))
-print('Recall:', recall_score(y_val_d, y_pred_val_d_logreg))
-print('Confusion Matrix:\n', confusion_matrix(y_val_d, y_pred_val_d_logreg))
+# Dividir el dataset quirúrgico en entrenamiento y prueba (70% entrenamiento, 30% prueba)
+X_train_s, X_test_s, y_train_s, y_test_s = train_test_split(X_surgical, y_surgical, test_size=0.3, random_state=42)
 
-# 2. KNN para Diabetes
-knn_diabetes = KNeighborsClassifier(n_neighbors=5)
-knn_diabetes.fit(X_train_d, y_train_d)
-y_pred_val_d_knn = knn_diabetes.predict(X_val_d)
+# Iterar sobre cada combinación de características (Surgical)
+for combo in combinations_surgical:
+    print(f"Entrenando modelo con las características: {combo}")
+    
+    # Seleccionar las características correspondientes
+    X_train_combo_s = X_train_s[list(combo)]
+    X_test_combo_s = X_test_s[list(combo)]
+    
+    # Entrenar un modelo de Regresión Logística
+    logreg_surgical = LogisticRegression(max_iter=10000)
+    logreg_surgical.fit(X_train_combo_s, y_train_s)
+    
+    # Predecir en el conjunto de prueba
+    y_pred_s = logreg_surgical.predict(X_test_combo_s)
+    
+    # Calcular y mostrar la precisión
+    accuracy_s = accuracy_score(y_test_s, y_pred_s)
+    print(f"Precisión del modelo Quirúrgico con las características {combo}: {accuracy_s}\n")
 
-# Evaluación de KNN para Diabetes
-print('Resultados de KNN para Diabetes:')
-print('Accuracy:', accuracy_score(y_val_d, y_pred_val_d_knn))
-print('Precision:', precision_score(y_val_d, y_pred_val_d_knn))
-print('Recall:', recall_score(y_val_d, y_pred_val_d_knn))
-print('Confusion Matrix:\n', confusion_matrix(y_val_d, y_pred_val_d_knn))
 
-# 3. Regresión Logística para el dataset quirúrgico
-logreg_surgical = LogisticRegression()
-logreg_surgical.fit(X_train_s, y_train_s)
-y_pred_val_s_logreg = logreg_surgical.predict(X_val_s)
+# ---- Visualización de las características para el dataset de Diabetes ----
+# Obtener las columnas excepto la columna 'Outcome'
+features = diabetes_data.columns.drop('Outcome')
 
-# Evaluación de Regresión Logística para Quirúrgico
-print('Resultados de Regresión Logística para Quirúrgico:')
-print('Accuracy:', accuracy_score(y_val_s, y_pred_val_s_logreg))
-print('Precision:', precision_score(y_val_s, y_pred_val_s_logreg))
-print('Recall:', recall_score(y_val_s, y_pred_val_s_logreg))
-print('Confusion Matrix:\n', confusion_matrix(y_val_s, y_pred_val_s_logreg))
+# Crear una figura con múltiples subplots
+plt.figure(figsize=(15, 12))
 
-# 4. KNN para el dataset quirúrgico
-knn_surgical = KNeighborsClassifier(n_neighbors=5)
-knn_surgical.fit(X_train_s, y_train_s)
-y_pred_val_s_knn = knn_surgical.predict(X_val_s)
+for i, feature in enumerate(features, 1):
+    plt.subplot(3, 3, i)
+    plt.hist(diabetes_data[diabetes_data['Outcome'] == 0][feature], color='blue', alpha=0.5, label='No Diabetes', bins=20)
+    plt.hist(diabetes_data[diabetes_data['Outcome'] == 1][feature], color='red', alpha=0.5, label='Diabetes', bins=20)
+    plt.title(f'Histograma de {feature}')
+    plt.xlabel(feature)
+    plt.ylabel('Frecuencia')
+    plt.legend()
 
-# Evaluación de KNN para Quirúrgico
-print('Resultados de KNN para Quirúrgico:')
-print('Accuracy:', accuracy_score(y_val_s, y_pred_val_s_knn))
-print('Precision:', precision_score(y_val_s, y_pred_val_s_knn))
-print('Recall:', recall_score(y_val_s, y_pred_val_s_knn))
-print('Confusion Matrix:\n', confusion_matrix(y_val_s, y_pred_val_s_knn))
+plt.tight_layout()
+plt.show()
+
+# ---- Visualización de las características para el dataset quirúrgico ----
+# Obtener las columnas excepto la columna 'complication'
+features = surgical_data_mod.columns.drop('complication')
+
+# Crear una figura con múltiples subplots
+plt.figure(figsize=(18, 15))
+
+for i, feature in enumerate(features, 1):
+    plt.subplot(6, 4, i)
+    plt.hist(surgical_data_mod[surgical_data_mod['complication'] == 0][feature], color='blue', alpha=0.5, label='No Complication', bins=20)
+    plt.hist(surgical_data_mod[surgical_data_mod['complication'] == 1][feature], color='red', alpha=0.5, label='Complication', bins=20)
+    plt.title(f'Histograma de {feature}')
+    plt.xlabel(feature)
+    plt.ylabel('Frecuencia')
+    plt.legend()
+
+plt.tight_layout()
+plt.show()
+
+# Crear el pairplot para todas las características en el dataset quirúrgico
+sns.pairplot(surgical_data_mod, hue='complication', palette="coolwarm")
+plt.show()
