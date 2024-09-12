@@ -44,7 +44,7 @@ sns.countplot(x='complication', data=surgical_data)
 plt.title('Distribución de Clases en el Dataset Quirúrgico (Complication)')
 plt.show()
 
-"""
+
 
 
 # Obtener las columnas excepto la columna 'Outcome'
@@ -107,6 +107,43 @@ plt.show()
 
 # Crear el pairplot para todas las características, coloreando por 'complication'
 sns.pairplot(surgical_data, hue='complication', palette="coolwarm")
+
+# Mostrar el gráfico
+plt.show()
+
+"""
+
+# Cargar el segundo conjunto de datos modificado
+surgical_data_mod = pd.read_csv('Surgical-deepnet_modificado.csv')
+
+# Obtener las columnas excepto la columna 'complication'
+features = surgical_data_mod.columns.drop('complication')
+
+# Crear una figura con múltiples subplots
+plt.figure(figsize=(18, 15))
+
+# Ajustamos el layout a 6x4 para acomodar las 10 características
+for i, feature in enumerate(features, 1):
+    
+    # Mostrar el resumen estadístico para cada feature
+    print(f"Descripción de {feature}:")
+    print(surgical_data_mod[feature].describe())
+    print("\n")
+
+    # Crear el histograma
+    plt.subplot(6, 4, i)  # Configurar el layout en 6 filas y 4 columnas
+    plt.hist(surgical_data_mod[surgical_data_mod['complication'] == 0][feature], color='blue', alpha=0.5, label='No Complication', bins=20)
+    plt.hist(surgical_data_mod[surgical_data_mod['complication'] == 1][feature], color='red', alpha=0.5, label='Complication', bins=20)
+    plt.title(f'Histograma de {feature}')
+    plt.xlabel(feature)
+    plt.ylabel('Frecuencia')
+    plt.legend()
+
+plt.tight_layout()
+plt.show()
+
+# Crear el pairplot para todas las características
+sns.pairplot(surgical_data_mod, hue='complication', palette="coolwarm")
 
 # Mostrar el gráfico
 plt.show()
