@@ -127,19 +127,6 @@ X_val_d, X_test_d, y_val_d, y_test_d = train_test_split(X_temp_d, y_temp_d, test
 X_train_s, X_temp_s, y_train_s, y_temp_s = train_test_split(X_surgical, y_surgical, test_size=0.3, random_state=42)
 X_val_s, X_test_s, y_val_s, y_test_s = train_test_split(X_temp_s, y_temp_s, test_size=0.5, random_state=42)
 
-# Normalización de los datos
-scaler = StandardScaler()
-
-# Normalizar el dataset de Diabetes
-X_train_d = scaler.fit_transform(X_train_d)
-X_val_d = scaler.transform(X_val_d)
-X_test_d = scaler.transform(X_test_d)
-
-# Normalizar el dataset quirúrgico
-X_train_s = scaler.fit_transform(X_train_s)
-X_val_s = scaler.transform(X_val_s)
-X_test_s = scaler.transform(X_test_s)
-
 # Entrenamiento de Regresión Logística para el dataset de Diabetes
 logreg_diabetes = LogisticRegression()
 logreg_diabetes.fit(X_train_d, y_train_d)
