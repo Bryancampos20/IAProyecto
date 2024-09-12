@@ -47,6 +47,43 @@ plt.show()
 """
 
 
+# Obtener las columnas excepto la columna 'Outcome'
+features = diabetes_data.columns.drop('Outcome')
+
+# Crear una figura con múltiples subplots
+plt.figure(figsize=(15, 12))
+
+for i, feature in enumerate(features, 1):
+    plt.subplot(3, 3, i)  # Configurar el layout en 3 filas y 3 columnas
+    plt.hist(diabetes_data[diabetes_data['Outcome'] == 0][feature], color='blue', alpha=0.5, label='No Diabetes', bins=20)
+    plt.hist(diabetes_data[diabetes_data['Outcome'] == 1][feature], color='red', alpha=0.5, label='Diabetes', bins=20)
+    plt.title(f'Histograma de {feature}')
+    plt.xlabel(feature)
+    plt.ylabel('Frecuencia')
+    plt.legend()
+
+plt.tight_layout()
+plt.show()
+
+# Obtener las columnas excepto la columna 'complication'
+features = surgical_data.columns.drop('complication')
+
+# Crear una figura con múltiples subplots
+plt.figure(figsize=(18, 15))
+
+# Ajustamos el layout a 6x4 para acomodar las 21 características
+for i, feature in enumerate(features, 1):
+    plt.subplot(6, 4, i)  # Configurar el layout en 6 filas y 4 columnas
+    plt.hist(surgical_data[surgical_data['complication'] == 0][feature], color='blue', alpha=0.5, label='No Complication', bins=20)
+    plt.hist(surgical_data[surgical_data['complication'] == 1][feature], color='red', alpha=0.5, label='Complication', bins=20)
+    plt.title(f'Histograma de {feature}')
+    plt.xlabel(feature)
+    plt.ylabel('Frecuencia')
+    plt.legend()
+
+plt.tight_layout()
+plt.show()
+
 # Separación de los datos y etiquetas para el dataset de Diabetes
 X_diabetes = diabetes_data.drop('Outcome', axis=1)
 y_diabetes = diabetes_data['Outcome']
