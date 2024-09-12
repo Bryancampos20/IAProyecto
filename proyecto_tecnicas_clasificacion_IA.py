@@ -241,44 +241,69 @@ print("Combinaciones de características quirúrgicas con precisión mayor a 0.8
 for combo, accuracy in combinations_with_high_accuracy_surgical:
     print(f"Combinación: {combo}, Precisión: {accuracy}")
 
-# ---- Visualización de las características para el dataset de Diabetes ----
-# Obtener las columnas excepto la columna 'Outcome'
-features = diabetes_data.columns.drop('Outcome')
 
-# Crear una figura con múltiples subplots
-plt.figure(figsize=(15, 12))
+# ---- Para el dataset de Diabetes KNN ----
 
-for i, feature in enumerate(features, 1):
-    plt.subplot(3, 3, i)
-    plt.hist(diabetes_data[diabetes_data['Outcome'] == 0][feature], color='blue', alpha=0.5, label='No Diabetes', bins=20)
-    plt.hist(diabetes_data[diabetes_data['Outcome'] == 1][feature], color='red', alpha=0.5, label='Diabetes', bins=20)
-    plt.title(f'Histograma de {feature}')
-    plt.xlabel(feature)
-    plt.ylabel('Frecuencia')
-    plt.legend()
+# Lista para almacenar combinaciones y su precisión si es mayor a 0.8
+combinations_with_high_accuracy_knn = []
 
-plt.tight_layout()
-plt.show()
+# Iterar sobre cada combinación de características (Diabetes)
+for combo in combinations_diabetes:
+    # Seleccionar las características correspondientes
+    X_train_combo_d = X_train_d[list(combo)]
+    X_test_combo_d = X_test_d[list(combo)]
+    
+    # Entrenar un modelo de K-Nearest Neighbors (KNN)
+    knn = KNeighborsClassifier(n_neighbors=5)
+    knn.fit(X_train_combo_d, y_train_d)
+    
+    # Predecir en el conjunto de prueba
+    y_pred_d = knn.predict(X_test_combo_d)
+    
+    # Calcular la precisión
+    accuracy_d = accuracy_score(y_test_d, y_pred_d)
+    
+    # Mostrar la precisión de todas las combinaciones
+    # print(f"Precisión del modelo de Diabetes con KNN y las características {combo}: {accuracy_d}\n")
+    
+    # Si la precisión es mayor a 0.8, almacenarla en la lista
+    if accuracy_d > 0.8:
+        combinations_with_high_accuracy_knn.append((combo, accuracy_d))
 
-# ---- Visualización de las características para el dataset quirúrgico ----
-# Obtener las columnas excepto la columna 'complication'
-features = surgical_data_mod.columns.drop('complication')
+# Mostrar las combinaciones con precisión mayor a 0.8
+print("Combinaciones de características con KNN y precisión mayor a 0.8:")
+for combo, accuracy in combinations_with_high_accuracy_knn:
+    print(f"Combinación: {combo}, Precisión: {accuracy}")
 
-# Crear una figura con múltiples subplots
-plt.figure(figsize=(18, 15))
+# ---- Para el dataset quirúrgico KNN ----
 
-for i, feature in enumerate(features, 1):
-    plt.subplot(6, 4, i)
-    plt.hist(surgical_data_mod[surgical_data_mod['complication'] == 0][feature], color='blue', alpha=0.5, label='No Complication', bins=20)
-    plt.hist(surgical_data_mod[surgical_data_mod['complication'] == 1][feature], color='red', alpha=0.5, label='Complication', bins=20)
-    plt.title(f'Histograma de {feature}')
-    plt.xlabel(feature)
-    plt.ylabel('Frecuencia')
-    plt.legend()
+# Lista para almacenar combinaciones y su precisión si es mayor a 0.8
+combinations_with_high_accuracy_knn_surgical = []
 
-plt.tight_layout()
-plt.show()
+# Iterar sobre cada combinación de características (Surgical)
+for combo in combinations_surgical:
+    # Seleccionar las características correspondientes
+    X_train_combo_s = X_train_s[list(combo)]
+    X_test_combo_s = X_test_s[list(combo)]
+    
+    # Entrenar un modelo de K-Nearest Neighbors (KNN)
+    knn = KNeighborsClassifier(n_neighbors=5)
+    knn.fit(X_train_combo_s, y_train_s)
+    
+    # Predecir en el conjunto de prueba
+    y_pred_s = knn.predict(X_test_combo_s)
+    
+    # Calcular la precisión
+    accuracy_s = accuracy_score(y_test_s, y_pred_s)
+    
+    # Mostrar la precisión de todas las combinaciones
+    print(f"Precisión del modelo quirúrgico con KNN y las características {combo}: {accuracy_s}\n")
+    
+    # Si la precisión es mayor a 0.8, almacenarla en la lista
+    if accuracy_s > 0.8:
+        combinations_with_high_accuracy_knn_surgical.append((combo, accuracy_s))
 
-# Crear el pairplot para todas las características en el dataset quirúrgico
-sns.pairplot(surgical_data_mod, hue='complication', palette="coolwarm")
-plt.show()
+# Mostrar las combinaciones con precisión mayor a 0.8
+print("Combinaciones de características quirúrgicas con KNN y precisión mayor a 0.8:")
+for combo, accuracy in combinations_with_high_accuracy_knn_surgical:
+    print(f"Combinación: {combo}, Precisión: {accuracy}")
