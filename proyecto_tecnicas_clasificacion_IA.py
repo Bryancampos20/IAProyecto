@@ -165,10 +165,11 @@ for r in range(1, len(features_diabetes)+1):
 # Dividir el dataset de Diabetes en entrenamiento y prueba (70% entrenamiento, 30% prueba)
 X_train_d, X_test_d, y_train_d, y_test_d = train_test_split(X_diabetes, y_diabetes, test_size=0.3, random_state=42)
 
+# Lista para almacenar combinaciones y su precisión si es mayor a 0.8
+combinations_with_high_accuracy = []
+
 # Iterar sobre cada combinación de características (Diabetes)
 for combo in combinations_diabetes:
-    print(f"Entrenando modelo con las características: {combo}")
-    
     # Seleccionar las características correspondientes
     X_train_combo_d = X_train_d[list(combo)]
     X_test_combo_d = X_test_d[list(combo)]
@@ -180,10 +181,20 @@ for combo in combinations_diabetes:
     # Predecir en el conjunto de prueba
     y_pred_d = logreg_diabetes.predict(X_test_combo_d)
     
-    # Calcular y mostrar la precisión
+    # Calcular la precisión
     accuracy_d = accuracy_score(y_test_d, y_pred_d)
-    print(f"Precisión del modelo de Diabetes con las características {combo}: {accuracy_d}\n")
+    
+    # Mostrar la precisión de todas las combinaciones
+    # print(f"Precisión del modelo de Diabetes con las características {combo}: {accuracy_d}\n")
+    
+    # Si la precisión es mayor a 0.8, almacenarla en la lista
+    if accuracy_d > 0.76:
+        combinations_with_high_accuracy.append((combo, accuracy_d))
 
+# Mostrar las combinaciones con precisión mayor a 0.8
+print("Combinaciones de características con precisión mayor a 0.8:")
+for combo, accuracy in combinations_with_high_accuracy:
+    print(f"Combinación: {combo}, Precisión: {accuracy}")
 
 # ---- Para el dataset quirúrgico ----
 # Separar características (X) y variable objetivo (y)
@@ -199,10 +210,11 @@ for r in range(1, len(features_surgical)+1):
 # Dividir el dataset quirúrgico en entrenamiento y prueba (70% entrenamiento, 30% prueba)
 X_train_s, X_test_s, y_train_s, y_test_s = train_test_split(X_surgical, y_surgical, test_size=0.3, random_state=42)
 
+# Lista para almacenar combinaciones y su precisión si es mayor a 0.8
+combinations_with_high_accuracy_surgical = []
+
 # Iterar sobre cada combinación de características (Surgical)
 for combo in combinations_surgical:
-    print(f"Entrenando modelo con las características: {combo}")
-    
     # Seleccionar las características correspondientes
     X_train_combo_s = X_train_s[list(combo)]
     X_test_combo_s = X_test_s[list(combo)]
@@ -214,10 +226,20 @@ for combo in combinations_surgical:
     # Predecir en el conjunto de prueba
     y_pred_s = logreg_surgical.predict(X_test_combo_s)
     
-    # Calcular y mostrar la precisión
+    # Calcular la precisión
     accuracy_s = accuracy_score(y_test_s, y_pred_s)
-    print(f"Precisión del modelo Quirúrgico con las características {combo}: {accuracy_s}\n")
+    
+    # Mostrar la precisión de todas las combinaciones
+    # print(f"Precisión del modelo Quirúrgico con las características {combo}: {accuracy_s}\n")
+    
+    # Si la precisión es mayor a 0.8, almacenarla en la lista
+    if accuracy_s > 0.8:
+        combinations_with_high_accuracy_surgical.append((combo, accuracy_s))
 
+# Mostrar las combinaciones con precisión mayor a 0.8
+print("Combinaciones de características quirúrgicas con precisión mayor a 0.8:")
+for combo, accuracy in combinations_with_high_accuracy_surgical:
+    print(f"Combinación: {combo}, Precisión: {accuracy}")
 
 # ---- Visualización de las características para el dataset de Diabetes ----
 # Obtener las columnas excepto la columna 'Outcome'
