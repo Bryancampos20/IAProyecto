@@ -54,6 +54,13 @@ features = diabetes_data.columns.drop('Outcome')
 plt.figure(figsize=(15, 12))
 
 for i, feature in enumerate(features, 1):
+
+    # Mostrar el resumen estadístico para cada feature
+    print(f"Descripción de {feature}:")
+    print(diabetes_data[feature].describe())
+    print("\n")
+
+    # Crear el histograma
     plt.subplot(3, 3, i)  # Configurar el layout en 3 filas y 3 columnas
     plt.hist(diabetes_data[diabetes_data['Outcome'] == 0][feature], color='blue', alpha=0.5, label='No Diabetes', bins=20)
     plt.hist(diabetes_data[diabetes_data['Outcome'] == 1][feature], color='red', alpha=0.5, label='Diabetes', bins=20)
@@ -73,6 +80,13 @@ plt.figure(figsize=(18, 15))
 
 # Ajustamos el layout a 6x4 para acomodar las 21 características
 for i, feature in enumerate(features, 1):
+    
+    # Mostrar el resumen estadístico para cada feature
+    print(f"Descripción de {feature}:")
+    print(surgical_data[feature].describe())
+    print("\n")
+
+    # Crear el histograma
     plt.subplot(6, 4, i)  # Configurar el layout en 6 filas y 4 columnas
     plt.hist(surgical_data[surgical_data['complication'] == 0][feature], color='blue', alpha=0.5, label='No Complication', bins=20)
     plt.hist(surgical_data[surgical_data['complication'] == 1][feature], color='red', alpha=0.5, label='Complication', bins=20)
@@ -82,6 +96,19 @@ for i, feature in enumerate(features, 1):
     plt.legend()
 
 plt.tight_layout()
+plt.show()
+
+# Crear el pairplot para todas las características
+sns.pairplot(diabetes_data, hue='Outcome', palette="coolwarm")
+
+# Mostrar el gráfico
+plt.show()
+
+
+# Crear el pairplot para todas las características, coloreando por 'complication'
+sns.pairplot(surgical_data, hue='complication', palette="coolwarm")
+
+# Mostrar el gráfico
 plt.show()
 
 # Separación de los datos y etiquetas para el dataset de Diabetes
