@@ -6,8 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
-
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 
 # Cargar los datos de diabetes
 diabetes_data = pd.read_csv('diabetes.csv')
@@ -15,10 +14,10 @@ diabetes_data = pd.read_csv('diabetes.csv')
 # Cargar el segundo conjunto de datos
 surgical_data = pd.read_csv('Surgical-deepnet.csv')
 
-"""
+
 # Ver las primeras filas de cada dataset
-print(diabetes_data.head())
-print(surgical_data.head())
+# print(diabetes_data.head())
+# print(surgical_data.head())
 
 # Resumen estadístico
 print(diabetes_data.describe())
@@ -26,25 +25,8 @@ print(surgical_data.describe())
 
 
 # Comprobar si hay valores faltantes
-print(diabetes_data.isnull().sum())
-print(surgical_data.isnull().sum())
-
-
-# Revisar las estadísticas descriptivas
-print(diabetes_data.describe())
-print(surgical_data.describe())
-
-# Visualización de la distribución de clases para el dataset de Diabetes
-sns.countplot(x='Outcome', data=diabetes_data)
-plt.title('Distribución de Clases en el Dataset de Diabetes')
-plt.show()
-
-# Visualización de la distribución de la variable de complicaciones
-sns.countplot(x='complication', data=surgical_data)
-plt.title('Distribución de Clases en el Dataset Quirúrgico (Complication)')
-plt.show()
-
-
+# print(diabetes_data.isnull().sum())
+# print(surgical_data.isnull().sum())
 
 
 # Obtener las columnas excepto la columna 'Outcome'
@@ -111,11 +93,9 @@ sns.pairplot(surgical_data, hue='complication', palette="coolwarm")
 # Mostrar el gráfico
 plt.show()
 
-"""
-
 # Cargar el segundo conjunto de datos modificado
 surgical_data_mod = pd.read_csv('Surgical-deepnet_modificado.csv')
-"""
+
 # Obtener las columnas excepto la columna 'complication'
 features = surgical_data_mod.columns.drop('complication')
 
@@ -147,11 +127,9 @@ sns.pairplot(surgical_data_mod, hue='complication', palette="coolwarm")
 
 # Mostrar el gráfico
 plt.show()
-"""
-# Cargar el dataset quirúrgico modificado
-surgical_data_mod = pd.read_csv('Surgical-deepnet_modificado.csv')
 
 # ---- Para el dataset de Diabetes ----
+
 # Separar características (X) y variable objetivo (y)
 X_diabetes = diabetes_data.drop('Outcome', axis=1)
 y_diabetes = diabetes_data['Outcome']
@@ -162,41 +140,16 @@ combinations_diabetes = []
 for r in range(1, len(features_diabetes)+1):
     combinations_diabetes.extend(itertools.combinations(features_diabetes, r))
 
-# Dividir el dataset de Diabetes en entrenamiento y prueba (70% entrenamiento, 30% prueba)
-X_train_d, X_test_d, y_train_d, y_test_d = train_test_split(X_diabetes, y_diabetes, test_size=0.3, random_state=42)
+# Dividir el dataset en 70% entrenamiento y 30% temporal
+X_train_d, X_temp_d, y_train_d, y_temp_d = train_test_split(X_diabetes, y_diabetes, test_size=0.3, random_state=42)
 
-# Lista para almacenar combinaciones y su precisión si es mayor a 0.8
-combinations_with_high_accuracy = []
+# Dividir el conjunto temporal en 15% validación y 15% prueba
+X_val_d, X_test_d, y_val_d, y_test_d = train_test_split(X_temp_d, y_temp_d, test_size=0.5, random_state=42)
 
-# Iterar sobre cada combinación de características (Diabetes)
-for combo in combinations_diabetes:
-    # Seleccionar las características correspondientes
-    X_train_combo_d = X_train_d[list(combo)]
-    X_test_combo_d = X_test_d[list(combo)]
-    
-    # Entrenar un modelo de Regresión Logística
-    logreg_diabetes = LogisticRegression(max_iter=10000)
-    logreg_diabetes.fit(X_train_combo_d, y_train_d)
-    
-    # Predecir en el conjunto de prueba
-    y_pred_d = logreg_diabetes.predict(X_test_combo_d)
-    
-    # Calcular la precisión
-    accuracy_d = accuracy_score(y_test_d, y_pred_d)
-    
-    # Mostrar la precisión de todas las combinaciones
-    # print(f"Precisión del modelo de Diabetes con las características {combo}: {accuracy_d}\n")
-    
-    # Si la precisión es mayor a 0.8, almacenarla en la lista
-    if accuracy_d > 0.76:
-        combinations_with_high_accuracy.append((combo, accuracy_d))
 
-# Mostrar las combinaciones con precisión mayor a 0.8
-print("Combinaciones de características con precisión mayor a 0.8:")
-for combo, accuracy in combinations_with_high_accuracy:
-    print(f"Combinación: {combo}, Precisión: {accuracy}")
 
 # ---- Para el dataset quirúrgico ----
+
 # Separar características (X) y variable objetivo (y)
 X_surgical = surgical_data_mod.drop('complication', axis=1)
 y_surgical = surgical_data_mod['complication']
@@ -207,103 +160,189 @@ combinations_surgical = []
 for r in range(1, len(features_surgical)+1):
     combinations_surgical.extend(itertools.combinations(features_surgical, r))
 
-# Dividir el dataset quirúrgico en entrenamiento y prueba (70% entrenamiento, 30% prueba)
-X_train_s, X_test_s, y_train_s, y_test_s = train_test_split(X_surgical, y_surgical, test_size=0.3, random_state=42)
+# Dividir el dataset quirúrgico en 70% entrenamiento y 30% temporal
+X_train_s, X_temp_s, y_train_s, y_temp_s = train_test_split(X_surgical, y_surgical, test_size=0.3, random_state=42)
 
-# Lista para almacenar combinaciones y su precisión si es mayor a 0.8
-combinations_with_high_accuracy_surgical = []
+# Dividir el conjunto temporal en 15% validación y 15% prueba
+X_val_s, X_test_s, y_val_s, y_test_s = train_test_split(X_temp_s, y_temp_s, test_size=0.5, random_state=42)
 
-# Iterar sobre cada combinación de características (Surgical)
-for combo in combinations_surgical:
-    # Seleccionar las características correspondientes
-    X_train_combo_s = X_train_s[list(combo)]
-    X_test_combo_s = X_test_s[list(combo)]
-    
-    # Entrenar un modelo de Regresión Logística
-    logreg_surgical = LogisticRegression(max_iter=10000)
-    logreg_surgical.fit(X_train_combo_s, y_train_s)
-    
-    # Predecir en el conjunto de prueba
-    y_pred_s = logreg_surgical.predict(X_test_combo_s)
-    
-    # Calcular la precisión
-    accuracy_s = accuracy_score(y_test_s, y_pred_s)
-    
-    # Mostrar la precisión de todas las combinaciones
-    # print(f"Precisión del modelo Quirúrgico con las características {combo}: {accuracy_s}\n")
-    
-    # Si la precisión es mayor a 0.8, almacenarla en la lista
-    if accuracy_s > 0.8:
-        combinations_with_high_accuracy_surgical.append((combo, accuracy_s))
-
-# Mostrar las combinaciones con precisión mayor a 0.8
-print("Combinaciones de características quirúrgicas con precisión mayor a 0.8:")
-for combo, accuracy in combinations_with_high_accuracy_surgical:
-    print(f"Combinación: {combo}, Precisión: {accuracy}")
-
-
-# ---- Para el dataset de Diabetes KNN ----
-
-# Lista para almacenar combinaciones y su precisión si es mayor a 0.8
-combinations_with_high_accuracy_knn = []
+# Lista para almacenar combinaciones y sus métricas
+combinations_with_metrics = []
 
 # Iterar sobre cada combinación de características (Diabetes)
 for combo in combinations_diabetes:
-    # Seleccionar las características correspondientes
-    X_train_combo_d = X_train_d[list(combo)]
-    X_test_combo_d = X_test_d[list(combo)]
+    # Seleccionar las características correspondientes para entrenamiento y validación
+    X_train_combo = X_train_d[list(combo)]
+    X_val_combo = X_val_d[list(combo)]
     
-    # Entrenar un modelo de K-Nearest Neighbors (KNN)
-    knn = KNeighborsClassifier(n_neighbors=5)
-    knn.fit(X_train_combo_d, y_train_d)
+    # Entrenar un modelo de Regresión Logística
+    logreg = LogisticRegression(max_iter=10000)
+    logreg.fit(X_train_combo, y_train_d)
     
-    # Predecir en el conjunto de prueba
-    y_pred_d = knn.predict(X_test_combo_d)
+    # Validar el modelo usando el conjunto de validación
+    y_pred_val = logreg.predict(X_val_combo)
     
-    # Calcular la precisión
-    accuracy_d = accuracy_score(y_test_d, y_pred_d)
+    # Calcular precisión, precision, recall, f1-score y matriz de confusión
+    accuracy_d = accuracy_score(y_val_d, y_pred_val)
+    precision_d = precision_score(y_val_d, y_pred_val, zero_division=1)
+    recall_d = recall_score(y_val_d, y_pred_val)
+    f1_d = f1_score(y_val_d, y_pred_val)
+    confusion_d = confusion_matrix(y_val_d, y_pred_val)
     
-    # Mostrar la precisión de todas las combinaciones
-    # print(f"Precisión del modelo de Diabetes con KNN y las características {combo}: {accuracy_d}\n")
-    
-    # Si la precisión es mayor a 0.8, almacenarla en la lista
-    if accuracy_d > 0.8:
-        combinations_with_high_accuracy_knn.append((combo, accuracy_d))
+    # Almacenar las combinaciones y sus métricas
+    combinations_with_metrics.append((combo, accuracy_d, precision_d, recall_d, f1_d, confusion_d))
 
-# Mostrar las combinaciones con precisión mayor a 0.8
-print("Combinaciones de características con KNN y precisión mayor a 0.8:")
-for combo, accuracy in combinations_with_high_accuracy_knn:
-    print(f"Combinación: {combo}, Precisión: {accuracy}")
+# Ordenar las combinaciones por F1-Score en orden descendente
+combinations_with_metrics.sort(key=lambda x: x[4], reverse=True)
 
-# ---- Para el dataset quirúrgico KNN ----
+# Mostrar las 5 mejores combinaciones
+print("Top 5 combinaciones de características (ordenadas por F1-Score):")
+for combo, accuracy, precision, recall, f1, confusion in combinations_with_metrics[:5]:
+    print(f"Combinación: {combo}, Accuracy: {accuracy}, Precision: {precision}, Recall: {recall}, F1-Score: {f1}")
+    print(f"Matriz de Confusión en Validación:\n{confusion}\n")
 
-# Lista para almacenar combinaciones y su precisión si es mayor a 0.8
-combinations_with_high_accuracy_knn_surgical = []
+# Lista para almacenar combinaciones y sus métricas
+combinations_with_metrics = []
+
+# Iterar sobre cada combinación de características (Diabetes)
+for combo in combinations_diabetes:
+    # Seleccionar las características correspondientes para entrenamiento y validación
+    X_train_combo = X_train_d[list(combo)]
+    X_val_combo = X_val_d[list(combo)]
+    
+    # Entrenar un modelo de Regresión Logística
+    logreg = LogisticRegression(max_iter=10000)
+    logreg.fit(X_train_combo, y_train_d)
+    
+    # Validar el modelo usando el conjunto de validación
+    y_pred_val = logreg.predict(X_val_combo)
+    
+    # Calcular precisión, precision, recall, f1-score y matriz de confusión
+    accuracy_d = accuracy_score(y_val_d, y_pred_val)
+    precision_d = precision_score(y_val_d, y_pred_val, zero_division=1)
+    recall_d = recall_score(y_val_d, y_pred_val)
+    f1_d = f1_score(y_val_d, y_pred_val)
+    confusion_d = confusion_matrix(y_val_d, y_pred_val)
+    
+    # Almacenar las combinaciones y sus métricas
+    combinations_with_metrics.append((combo, accuracy_d, precision_d, recall_d, f1_d, confusion_d))
+
+# Ordenar las combinaciones por F1-Score en orden descendente
+combinations_with_metrics.sort(key=lambda x: x[4], reverse=True)
+
+# Mostrar las 5 mejores combinaciones
+print("Top 5 combinaciones de características (ordenadas por F1-Score):")
+for combo, accuracy, precision, recall, f1, confusion in combinations_with_metrics[:5]:
+    print(f"Combinación: {combo}, Accuracy: {accuracy}, Precision: {precision}, Recall: {recall}, F1-Score: {f1}")
+    print(f"Matriz de Confusión en Validación:\n{confusion}\n")
+
+
+# Cargar el dataset de Diabetes
+diabetes_data_knn = pd.read_csv('diabetes.csv')
+
+# Separar características (X) y variable objetivo (y)
+X_diabetes_knn = diabetes_data_knn.drop('Outcome', axis=1)
+y_diabetes_knn = diabetes_data_knn['Outcome']
+
+# Generar todas las combinaciones posibles de las columnas de X (Diabetes)
+features_diabetes_knn = X_diabetes_knn.columns
+combinations_diabetes_knn = []
+for r in range(1, len(features_diabetes_knn)+1):
+    combinations_diabetes_knn.extend(itertools.combinations(features_diabetes_knn, r))
+
+# Dividir el dataset de Diabetes en 70% entrenamiento y 30% restante (que luego se dividirá en validación y prueba)
+X_train_d_knn, X_temp_d_knn, y_train_d_knn, y_temp_d_knn = train_test_split(X_diabetes_knn, y_diabetes_knn, test_size=0.3, random_state=42)
+
+# Dividir el 30% restante en 15% para validación y 15% para testing
+X_val_d_knn, X_test_d_knn, y_val_d_knn, y_test_d_knn = train_test_split(X_temp_d_knn, y_temp_d_knn, test_size=0.5, random_state=42)
+
+# Lista para almacenar combinaciones y sus métricas
+combinations_with_metrics_knn_diabetes = []
+
+# Iterar sobre cada combinación de características (Diabetes)
+for combo in combinations_diabetes_knn:
+    # Seleccionar las características correspondientes para entrenamiento y validación
+    X_train_combo_d_knn = X_train_d_knn[list(combo)]
+    X_val_combo_d_knn = X_val_d_knn[list(combo)]
+    X_test_combo_d_knn = X_test_d_knn[list(combo)]
+    
+    # Entrenar un modelo de KNN con el conjunto de entrenamiento
+    knn_diabetes = KNeighborsClassifier(n_neighbors=5)
+    knn_diabetes.fit(X_train_combo_d_knn, y_train_d_knn)
+    
+    # Validar el modelo usando el conjunto de validación
+    y_pred_val_d_knn = knn_diabetes.predict(X_val_combo_d_knn)
+    
+    # Evaluar el modelo en el conjunto de validación
+    accuracy_d_knn = accuracy_score(y_val_d_knn, y_pred_val_d_knn)
+    precision_d_knn = precision_score(y_val_d_knn, y_pred_val_d_knn, zero_division=1)
+    recall_d_knn = recall_score(y_val_d_knn, y_pred_val_d_knn)
+    f1_d_knn = f1_score(y_val_d_knn, y_pred_val_d_knn)
+    confusion_d_knn = confusion_matrix(y_val_d_knn, y_pred_val_d_knn)
+    
+    # Almacenar las combinaciones y sus métricas
+    combinations_with_metrics_knn_diabetes.append((combo, accuracy_d_knn, precision_d_knn, recall_d_knn, f1_d_knn, confusion_d_knn))
+
+# Ordenar las combinaciones por F1-Score en orden descendente
+combinations_with_metrics_knn_diabetes.sort(key=lambda x: x[4], reverse=True)
+
+# Mostrar el Top 5 combinaciones
+print("Top 5 combinaciones de características de KNN Diabetes (ordenadas por F1-Score):")
+for combo, accuracy, precision, recall, f1, confusion in combinations_with_metrics_knn_diabetes[:5]:
+    print(f"Combinación: {combo}, Accuracy: {accuracy}, Precision: {precision}, Recall: {recall}, F1-Score: {f1}")
+    print(f"Matriz de Confusión en Validación:\n{confusion}\n")
+
+    # Cargar el dataset quirúrgico modificado
+surgical_data_knn = pd.read_csv('Surgical-deepnet_modificado.csv')
+
+# Separar características (X) y variable objetivo (y)
+X_surgical_knn = surgical_data_knn.drop('complication', axis=1)
+y_surgical_knn = surgical_data_knn['complication']
+
+# Generar todas las combinaciones posibles de las columnas de X (Surgical)
+features_surgical_knn = X_surgical_knn.columns
+combinations_surgical_knn = []
+for r in range(1, len(features_surgical_knn)+1):
+    combinations_surgical_knn.extend(itertools.combinations(features_surgical_knn, r))
+
+# Dividir el dataset quirúrgico en 70% entrenamiento y 30% restante (que luego se dividirá en validación y prueba)
+X_train_s_knn, X_temp_s_knn, y_train_s_knn, y_temp_s_knn = train_test_split(X_surgical_knn, y_surgical_knn, test_size=0.3, random_state=42)
+
+# Dividir el 30% restante en 15% para validación y 15% para testing
+X_val_s_knn, X_test_s_knn, y_val_s_knn, y_test_s_knn = train_test_split(X_temp_s_knn, y_temp_s_knn, test_size=0.5, random_state=42)
+
+# Lista para almacenar combinaciones y sus métricas
+combinations_with_metrics_knn_surgical = []
 
 # Iterar sobre cada combinación de características (Surgical)
-for combo in combinations_surgical:
-    # Seleccionar las características correspondientes
-    X_train_combo_s = X_train_s[list(combo)]
-    X_test_combo_s = X_test_s[list(combo)]
+for combo in combinations_surgical_knn:
+    # Seleccionar las características correspondientes para entrenamiento y validación
+    X_train_combo_s_knn = X_train_s_knn[list(combo)]
+    X_val_combo_s_knn = X_val_s_knn[list(combo)]
+    X_test_combo_s_knn = X_test_s_knn[list(combo)]
     
-    # Entrenar un modelo de K-Nearest Neighbors (KNN)
-    knn = KNeighborsClassifier(n_neighbors=5)
-    knn.fit(X_train_combo_s, y_train_s)
+    # Entrenar un modelo de KNN con el conjunto de entrenamiento
+    knn_surgical = KNeighborsClassifier(n_neighbors=5)
+    knn_surgical.fit(X_train_combo_s_knn, y_train_s_knn)
     
-    # Predecir en el conjunto de prueba
-    y_pred_s = knn.predict(X_test_combo_s)
+    # Validar el modelo usando el conjunto de validación
+    y_pred_val_s_knn = knn_surgical.predict(X_val_combo_s_knn)
     
-    # Calcular la precisión
-    accuracy_s = accuracy_score(y_test_s, y_pred_s)
+    # Evaluar el modelo en el conjunto de validación
+    accuracy_s_knn = accuracy_score(y_val_s_knn, y_pred_val_s_knn)
+    precision_s_knn = precision_score(y_val_s_knn, y_pred_val_s_knn, zero_division=1)
+    recall_s_knn = recall_score(y_val_s_knn, y_pred_val_s_knn)
+    f1_s_knn = f1_score(y_val_s_knn, y_pred_val_s_knn)
+    confusion_s_knn = confusion_matrix(y_val_s_knn, y_pred_val_s_knn)
     
-    # Mostrar la precisión de todas las combinaciones
-    print(f"Precisión del modelo quirúrgico con KNN y las características {combo}: {accuracy_s}\n")
-    
-    # Si la precisión es mayor a 0.8, almacenarla en la lista
-    if accuracy_s > 0.8:
-        combinations_with_high_accuracy_knn_surgical.append((combo, accuracy_s))
+    # Almacenar las combinaciones y sus métricas
+    combinations_with_metrics_knn_surgical.append((combo, accuracy_s_knn, precision_s_knn, recall_s_knn, f1_s_knn, confusion_s_knn))
 
-# Mostrar las combinaciones con precisión mayor a 0.8
-print("Combinaciones de características quirúrgicas con KNN y precisión mayor a 0.8:")
-for combo, accuracy in combinations_with_high_accuracy_knn_surgical:
-    print(f"Combinación: {combo}, Precisión: {accuracy}")
+# Ordenar las combinaciones por F1-Score en orden descendente
+combinations_with_metrics_knn_surgical.sort(key=lambda x: x[4], reverse=True)
+
+# Mostrar el Top 5 combinaciones
+print("Top 5 combinaciones de características de KNN Quirúrgico (ordenadas por F1-Score):")
+for combo, accuracy, precision, recall, f1, confusion in combinations_with_metrics_knn_surgical[:5]:
+    print(f"Combinación: {combo}, Accuracy: {accuracy}, Precision: {precision}, Recall: {recall}, F1-Score: {f1}")
+    print(f"Matriz de Confusión en Validación:\n{confusion}\n")
